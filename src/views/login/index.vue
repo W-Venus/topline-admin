@@ -31,6 +31,9 @@
 </template>
 
 <script>
+import axios from 'axios'
+// 引入极验文件
+import '@/vendor/gt'
 export default {
   name: 'AppLogin',
   data () {
@@ -44,11 +47,75 @@ export default {
   },
 
   methods: {
-    handleLogin () {
-      console.log('123')
-    },
     handleSendCode () {
-
+      const { mobile } = this.UserForm
+      axios({
+        method: 'GET',
+        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
+      }).then(res => {
+        // console.log(res.data)
+        // 获取返回结果
+        const { data } = res.data
+        // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
+        window.initGeetest({
+        // 以下配置参数来自服务端 SDK
+          gt: data.gt,
+          challenge: data.challenge,
+          offline: !data.success,
+          new_captcha: data.new_captcha,
+          product: 'bind' // 隐藏式弹出框验证
+        }, function (captchaObj) {
+          // 这里可以调用验证实例 captchaObj 的实例方法
+          captchaObj.onReady(function () {
+            // 验证码ready之后才能调用verify方法显示验证码
+            captchaObj.verify() // 显示验证码
+          }).onSuccess(function () {
+            // your code
+            // console.log(captchaObj.getValidate())
+            const {
+              geetest_challenge: challenge,
+              geetest_seccode: seccode,
+              geetest_validate: validate } = captchaObj.getValidate()
+            axios({
+              method: 'GET',
+              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
+              params: {
+                challenge,
+                seccode,
+                validate
+              }
+            }).then(res => {
+              console.log(res.data)
+            })
+          }).onError(function () {
+            // your code
+          })
+        })
+      }
+      )
+    },
+    handleLogin () {
+      axios({
+        method: 'POST',
+        url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+        data: this.UserForm
+      })
+        .then(res => {
+          // console.log(res.data)
+          // 登录成功,提示消息
+          this.$message({
+            message: '登录成功',
+            type: 'success'
+          })
+          // 登录成功跳转首页
+          this.$router.push({
+            name: 'home'
+          })
+        })
+        .catch((e) => {
+        // 登录失败,提示消息
+          this.$message.error('登录失败,请检查手机号或验证码')
+        })
     }
   }
 }
