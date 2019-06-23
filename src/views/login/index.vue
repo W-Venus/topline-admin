@@ -2,7 +2,7 @@
   <div class="login-wrap">
     <div class="form-wrap">
       <div class="form-head">
-        <img src="./logo_index.png">
+        <img src="./img/logo_index.png">
       </div>
        <el-form class="login-form" ref="form" :model="UserForm" :rules="rules">
         <el-form-item prop="mobile">
@@ -47,16 +47,12 @@ export default {
       rules: {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { patten: /^1[3456789]\d{9}$/, message: '请输入有效的手机号', trigger: 'blur' }
+          { pattern: /^1[3456789]\d{9}$/, message: '请输入有效的手机号', trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
-          { patten: /\d{6}/, message: '请输入有效的验证码', trigger: 'blur' }
+          { pattern: /\d{6}/, message: '请输入有效的验证码', trigger: 'blur' }
         ]
-        // type: [
-        //   { required: true, message: '请勾选协议' },
-        //   { patten: /true/, message: '请勾选协议' }
-        // ]
       }
     }
   },
@@ -182,6 +178,9 @@ export default {
           this.$router.push({
             name: 'home'
           })
+          // 登录成功,使用sessionStorage保存用户信息
+          const userInfo = res.data.data
+          window.sessionStorage.setItem('user_info', JSON.stringify(userInfo))
         })
         .catch((e) => { // 状态码>=400时进入这里,表示登录失败
         // 登录失败,提示消息
@@ -195,7 +194,7 @@ export default {
 <style lang='less' scoped>
 .login-wrap {
   height: 100%;
-  background-image: url(./login_bg.jpg);
+  background-image: url(./img/login_bg.jpg);
   display: flex;
   justify-content: center;
   align-items: center;
