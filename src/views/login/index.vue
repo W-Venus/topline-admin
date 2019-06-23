@@ -47,7 +47,7 @@ export default {
       rules: {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { patten: /\d{11}/, message: '请输入有效的手机号', trigger: 'blur' }
+          { patten: /^1[3456789]\d{9}$/, message: '请输入有效的手机号', trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -62,9 +62,71 @@ export default {
   },
 
   methods: {
-    // 发送验证码
+    // 封装发送验证码的函数
+    showGeeTest () {
+      const { mobile } = this.UserForm
+      axios({
+        method: 'GET',
+        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
+      }).then(res => {
+        // console.log(res.data)
+        // 获取返回结果
+        const { data } = res.data
+        // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
+        window.initGeetest({
+          // 以下配置参数来自服务端 SDK
+          gt: data.gt,
+          challenge: data.challenge,
+          offline: !data.success,
+          new_captcha: data.new_captcha,
+          product: 'bind' // 隐藏式弹出框验证
+        }, (captchaObj) => {
+          // 这里可以调用验证实例 captchaObj 的实例方法
+          captchaObj.onReady(() => {
+            // 验证码ready之后才能调用verify方法显示验证码
+            captchaObj.verify() // 显示弹框验证码
+          }).onSuccess(() => {
+            // console.log(captchaObj.getValidate())
+            // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
+            const {
+              geetest_challenge: challenge,
+              geetest_seccode: seccode,
+              geetest_validate: validate } = captchaObj.getValidate()
+            // 向短信接口发送请求
+            axios({
+              method: 'GET',
+              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
+              params: {
+                challenge,
+                seccode,
+                validate
+              }
+            }).then(res => {
+            // console.log(res.data) // 返回发送短信时的手机号
+            // 调用倒计时函数
+              this.codeCountDown()
+            })
+          }).onError(function () {
+            // your code
+          })
+        })
+      }
+      )
+    },
+    // 发送验证码时验证手机号
     handleSendCode () {
-      // 实现倒计时功能
+      this.$refs['form'].validateField('mobile', errorMessage => {
+        // console.log(errorMessage)
+        // 判断,手机号输入正确,errorMessage 是空,输入错误,errorMessage是 '请输入手机号',所以这里判断长度
+        if (errorMessage.trim().length > 0) {
+          return
+        }
+        // 调用发送验证码
+        this.showGeeTest()
+      })
+    },
+    // 封装倒计时功能
+    codeCountDown () {
       var oBtn = document.getElementById('SendBtn')
       var flag = true
       var time = 60
@@ -83,53 +145,6 @@ export default {
           }
         }, 1000)
       }
-      const { mobile } = this.UserForm
-      axios({
-        method: 'GET',
-        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
-      }).then(res => {
-        // console.log(res.data)
-        // 获取返回结果
-        const { data } = res.data
-        // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
-        window.initGeetest({
-        // 以下配置参数来自服务端 SDK
-          gt: data.gt,
-          challenge: data.challenge,
-          offline: !data.success,
-          new_captcha: data.new_captcha,
-          product: 'bind' // 隐藏式弹出框验证
-        }, function (captchaObj) {
-          // 这里可以调用验证实例 captchaObj 的实例方法
-          captchaObj.onReady(function () {
-            // 验证码ready之后才能调用verify方法显示验证码
-            captchaObj.verify() // 显示弹框验证码
-          }).onSuccess(function () {
-            // your code
-            // console.log(captchaObj.getValidate())
-            // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
-            const {
-              geetest_challenge: challenge,
-              geetest_seccode: seccode,
-              geetest_validate: validate } = captchaObj.getValidate()
-            // 向短信接口发送请求
-            axios({
-              method: 'GET',
-              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
-              params: {
-                challenge,
-                seccode,
-                validate
-              }
-            }).then(res => {
-              console.log(res.data) // 返回发送短信时的手机号
-            })
-          }).onError(function () {
-            // your code
-          })
-        })
-      }
-      )
     },
     // 对整个表单进行验证
     handleLogin () {
@@ -137,15 +152,16 @@ export default {
         if (!valid) {
           return
         }
+        // 调用登录功能
         this.submitLogin()
       })
     },
-    // 登录
+    // 封装登录功能
     submitLogin () {
       if (this.UserForm.type !== true) {
         this.$message({
           showClose: true,
-          message: '警告:请勾选协议',
+          message: '请勾选协议',
           type: 'warning'
         })
         return
