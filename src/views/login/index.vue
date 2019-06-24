@@ -178,9 +178,9 @@ export default {
           this.$router.push({
             name: 'home'
           })
-          // 登录成功,使用sessionStorage保存用户信息
+          // 登录成功,使用localStorage保存用户信息
           const userInfo = res.data.data
-          window.sessionStorage.setItem('user_info', JSON.stringify(userInfo))
+          window.localStorage.setItem('user_info', JSON.stringify(userInfo))
         })
         .catch((e) => { // 状态码>=400时进入这里,表示登录失败
         // 登录失败,提示消息

@@ -28,7 +28,7 @@ export default {
     }
   },
   created () {
-    this.userInfo = JSON.parse(window.sessionStorage.getItem('user_info'))
+    this.userInfo = JSON.parse(window.localStorage.getItem('user_info'))
   },
   methods: {}
 }
