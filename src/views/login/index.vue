@@ -34,6 +34,8 @@
 import axios from 'axios'
 // 引入极验文件
 import '@/vendor/gt'
+// 引入模块化本地存储
+import { setUser } from '@/utils/auth'
 export default {
   name: 'AppLogin',
   data () {
@@ -180,7 +182,8 @@ export default {
           })
           // 登录成功,使用localStorage保存用户信息
           const userInfo = res.data.data
-          window.localStorage.setItem('user_info', JSON.stringify(userInfo))
+          // window.localStorage.setItem('user_info', JSON.stringify(userInfo))
+          setUser(userInfo)
         })
         .catch((e) => { // 状态码>=400时进入这里,表示登录失败
         // 登录失败,提示消息
