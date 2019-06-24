@@ -11,7 +11,7 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item icon="iconfont icon-people">个人信息</el-dropdown-item>
           <el-dropdown-item icon="iconfont icon-lianjie">git地址</el-dropdown-item>
-          <el-dropdown-item icon="iconfont icon-tuichu">退出</el-dropdown-item>
+          <el-dropdown-item icon="iconfont icon-tuichu" @click.native="handleLogout">退出</el-dropdown-item>
         </el-dropdown-menu>
         </el-dropdown>
       </el-col>
@@ -30,7 +30,29 @@ export default {
   created () {
     this.userInfo = JSON.parse(window.localStorage.getItem('user_info'))
   },
-  methods: {}
+  methods: {
+    handleLogout () {
+      this.$confirm('确认退出吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '退出成功!'
+        })
+        // 清除本地存储中的用户信息
+        window.localStorage.removeItem('user_info')
+        // 跳转回登录页
+        this.$router.push({ name: 'login' })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消退出'
+        })
+      })
+    }
+  }
 }
 </script>
 
