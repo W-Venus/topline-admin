@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row class="header">
-      <el-col :span="17"><div class="grid-content">江苏传智播客教育科技股份有限公司</div></el-col>
+      <el-col :span="17"><div class="grid-content"><i class="iconfont icon-ma1"></i>江苏传智播客教育科技股份有限公司</div></el-col>
       <el-col :span="3" :offset="4">
         <img class="photo" :src="userInfo.photo">
         <el-dropdown trigger="click">
@@ -9,7 +9,7 @@
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="iconfont icon-people">个人信息</el-dropdown-item>
+          <el-dropdown-item icon="iconfont icon-ren1">个人信息</el-dropdown-item>
           <el-dropdown-item icon="iconfont icon-lianjie">git地址</el-dropdown-item>
           <el-dropdown-item icon="iconfont icon-tuichu" @click.native="handleLogout">退出</el-dropdown-item>
         </el-dropdown-menu>
@@ -62,6 +62,9 @@ export default {
 </script>
 
 <style lang='less' scoped>
+   i {
+     margin-right: 10px
+  }
   .photo {
     width: 40px;
     height: 40px;
