@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+// 加载进度条
+import nprogress from 'nprogress'
 
 Vue.use(Router)
 
@@ -36,6 +38,8 @@ const router = new Router({
  */
 // 配置全局前置守卫.控制页面访问权限
 router.beforeEach((to, from, next) => {
+  // 开启进度条
+  nprogress.start()
   // 获取本地存储中的用户信息,如果有,说明已经登录了
   const userInfo = window.localStorage.getItem('user_info')
   if (to.path !== '/login') {
@@ -58,6 +62,10 @@ router.beforeEach((to, from, next) => {
       window.location.reload()
     }
   }
+})
+// 配置全局后置钩子,结束进度条
+router.afterEach((to, from) => {
+  nprogress.done()
 })
 // 导出路由
 export default router
