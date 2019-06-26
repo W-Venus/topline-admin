@@ -169,14 +169,15 @@ export default {
       })
         .then(res => { // 状态码>=200 <400时,进入这里,表示登录成功
           // console.log(res.data)
+          // 登录成功跳转首页
+          this.$router.push({
+            name: 'home'
+          })
+          console.log(123)
           // 登录成功,提示消息
           this.$message({
             message: '登录成功',
             type: 'success'
-          })
-          // 登录成功跳转首页
-          this.$router.push({
-            name: 'home'
           })
           // 登录成功,使用localStorage保存用户信息
           const userInfo = res.data.data

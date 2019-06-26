@@ -8,11 +8,11 @@ Vue.use(Router)
 // 给路由起个名字,方便使用
 const router = new Router({
   routes: [
-    {
+    { // layout组件
       path: '/',
       component: () => import('@/views/layout'),
       children: [
-        {
+        { // layout组件的默认子组件
           name: 'home',
           path: '',
           component: () => import('@/views/home')
@@ -21,6 +21,11 @@ const router = new Router({
           name: 'publish',
           path: '/publish',
           component: () => import('@/views/publish')
+        },
+        {
+          name: 'article-list',
+          path: '/article',
+          component: () => import('@/views/article')
         }
       ]
     },
@@ -45,6 +50,10 @@ router.beforeEach((to, from, next) => {
   if (to.path !== '/login') {
   // 非登录页面
     if (!userInfo) {
+      // 解决登录页进度条卡顿问题,判断如果路径来自登录页,就停止进度条
+      if (from.path === '/login') {
+        nprogress.done()
+      }
       // 没有登录,跳转到登录页面
       next({ name: 'login' })
     } else {
