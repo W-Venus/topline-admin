@@ -45,12 +45,12 @@ export default {
   methods: {
     async loadArticles () {
       // 获取token,设置请求头,请求头中设置 Authorization
-      const res = await this.$http({
+      const data = await this.$http({
         method: 'GET',
         url: '/articles'
       })
-      this.tableData = res.data.data.results
-      console.log(res.data.data.results)
+      this.tableData = data.results
+      // console.log(res.data.data.results)
     }
   }
 }

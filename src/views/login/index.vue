@@ -34,6 +34,7 @@
 // import axios from 'axios'
 // 引入极验文件
 import '@/vendor/gt'
+import initGeetest from '@/utils/init-geetest'
 // 引入模块化本地存储
 import { setUser } from '@/utils/auth'
 export default {
@@ -61,53 +62,46 @@ export default {
 
   methods: {
     // 封装发送验证码的函数
-    showGeeTest () {
+    async showGeeTest () {
       const { mobile } = this.UserForm
-      this.$http({
+      const data = await this.$http({
         method: 'GET',
         url: `/captchas/${mobile}`
-      }).then(res => {
-        // console.log(res.data)
-        // 获取返回结果
-        const { data } = res.data
-        // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
-        window.initGeetest({
-          // 以下配置参数来自服务端 SDK
-          gt: data.gt,
-          challenge: data.challenge,
-          offline: !data.success,
-          new_captcha: data.new_captcha,
-          product: 'bind' // 隐藏式弹出框验证
-        }, (captchaObj) => {
-          // 这里可以调用验证实例 captchaObj 的实例方法
-          captchaObj.onReady(() => {
-            // 验证码ready之后才能调用verify方法显示验证码
-            captchaObj.verify() // 显示弹框验证码
-          }).onSuccess(() => {
-            // console.log(captchaObj.getValidate())
-            // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
-            const {
-              geetest_challenge: challenge,
-              geetest_seccode: seccode,
-              geetest_validate: validate } = captchaObj.getValidate()
-            // 向短信接口发送请求
-            this.$http({
-              method: 'GET',
-              url: `/sms/codes/${mobile}`,
-              params: {
-                challenge,
-                seccode,
-                validate
-              }
-            }).then(res => {
-            // console.log(res.data) // 返回发送短信时的手机号
-            // 调用倒计时函数
-              this.codeCountDown()
-            })
-          })
+      })
+      // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
+      const captchaObj = await initGeetest({
+        // 以下配置参数来自服务端 SDK
+        gt: data.gt,
+        challenge: data.challenge,
+        offline: !data.success,
+        new_captcha: data.new_captcha,
+        product: 'bind' // 隐藏式弹出框验证
+      })
+      // 这里可以调用验证实例 captchaObj 的实例方法
+      captchaObj.onReady(() => {
+        // 验证码ready之后才能调用verify方法显示验证码
+        captchaObj.verify() // 显示弹框验证码
+      }).onSuccess(async () => {
+        // console.log(captchaObj.getValidate())
+        // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
+        const {
+          geetest_challenge: challenge,
+          geetest_seccode: seccode,
+          geetest_validate: validate } = captchaObj.getValidate()
+        // 向短信接口发送请求
+        await this.$http({
+          method: 'GET',
+          url: `/sms/codes/${mobile}`,
+          params: {
+            challenge,
+            seccode,
+            validate
+          }
         })
-      }
-      )
+        // console.log(res.data) // 返回发送短信时的手机号
+        // 调用倒计时函数
+        this.codeCountDown()
+      })
     },
     // 发送验证码时验证手机号
     handleSendCode () {
@@ -153,41 +147,38 @@ export default {
       })
     },
     // 封装登录功能
-    submitLogin () {
-      if (this.UserForm.type !== true) {
-        this.$message({
-          showClose: true,
-          message: '请勾选协议',
-          type: 'warning'
-        })
-        return
-      }
-      this.$http({
-        method: 'POST',
-        url: '/authorizations',
-        data: this.UserForm // 表单同步的手机号和验证码
-      })
-        .then(res => { // 状态码>=200 <400时,进入这里,表示登录成功
-          // console.log(res.data)
-          // 登录成功跳转首页
-          this.$router.push({
-            name: 'home'
-          })
-          console.log(123)
-          // 登录成功,提示消息
+    async submitLogin () {
+      try {
+        if (this.UserForm.type !== true) {
           this.$message({
-            message: '登录成功',
-            type: 'success'
+            showClose: true,
+            message: '请勾选协议',
+            type: 'warning'
           })
-          // 登录成功,使用localStorage保存用户信息
-          const userInfo = res.data.data
-          // window.localStorage.setItem('user_info', JSON.stringify(userInfo))
-          setUser(userInfo)
+          return
+        }
+        const userInfo = await this.$http({
+          method: 'POST',
+          url: '/authorizations',
+          data: this.UserForm // 表单同步的手机号和验证码
         })
-        .catch((e) => { // 状态码>=400时进入这里,表示登录失败
+        // .then(res => { // 状态码>=200 <400时,进入这里,表示登录成功
+        // 登录成功跳转首页
+        this.$router.push({
+          name: 'home'
+        })
+        // 登录成功,提示消息
+        this.$message({
+          message: '登录成功',
+          type: 'success'
+        })
+        // 登录成功,使用localStorage保存用户信息
+        // window.localStorage.setItem('user_info', JSON.stringify(userInfo))
+        setUser(userInfo)
+      } catch {
         // 登录失败,提示消息
-          this.$message.error('登录失败,请检查手机号或验证码')
-        })
+        this.$message.error('登录失败,请检查手机号或验证码')
+      }
     }
   }
 }
