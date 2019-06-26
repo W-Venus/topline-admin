@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 // 引入极验文件
 import '@/vendor/gt'
 // 引入模块化本地存储
@@ -63,9 +63,9 @@ export default {
     // 封装发送验证码的函数
     showGeeTest () {
       const { mobile } = this.UserForm
-      axios({
+      this.$http({
         method: 'GET',
-        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
+        url: `/captchas/${mobile}`
       }).then(res => {
         // console.log(res.data)
         // 获取返回结果
@@ -91,9 +91,9 @@ export default {
               geetest_seccode: seccode,
               geetest_validate: validate } = captchaObj.getValidate()
             // 向短信接口发送请求
-            axios({
+            this.$http({
               method: 'GET',
-              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
+              url: `/sms/codes/${mobile}`,
               params: {
                 challenge,
                 seccode,
@@ -104,8 +104,6 @@ export default {
             // 调用倒计时函数
               this.codeCountDown()
             })
-          }).onError(function () {
-            // your code
           })
         })
       }
@@ -164,9 +162,9 @@ export default {
         })
         return
       }
-      axios({
+      this.$http({
         method: 'POST',
-        url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+        url: '/authorizations',
         data: this.UserForm // 表单同步的手机号和验证码
       })
         .then(res => { // 状态码>=200 <400时,进入这里,表示登录成功
