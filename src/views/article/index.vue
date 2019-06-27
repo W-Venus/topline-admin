@@ -18,7 +18,12 @@
         </el-form-item>
         <el-form-item label="频道">
           <el-select v-model="filterParams.channel_id">
-            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option
+              v-for="item in channels"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="时间选择">
@@ -120,14 +125,30 @@ export default {
         channel_id: '', // 文章id
         begin_pubdate: '', // 开始时间
         end_pubdate: '' // 结束时间
-      }
+      },
+      channels: [] // 频道数据
     }
   },
   created () {
-    // 初始化开始就请求数据
+    // 初始化开始就请求文章内容列表数据
     this.loadArticles()
+    // 请求频道数据
+    this.loadChannels()
   },
   methods: {
+    // 请求频道数据
+    async loadChannels () {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: '/channels'
+        })
+        //  console.log(channels)
+        this.channels = data.channels
+      } catch (err) {
+        this.$message.error('请求错误')
+      }
+    },
     async loadArticles () {
       // 请求开始,开始加载
       this.loading = true
