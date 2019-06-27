@@ -42,36 +42,36 @@ const router = new Router({
  * next 允许通过(访问)的方法
  */
 // 配置全局前置守卫.控制页面访问权限
-router.beforeEach((to, from, next) => {
-  // 开启进度条
-  nprogress.start()
-  // 获取本地存储中的用户信息,如果有,说明已经登录了
-  const userInfo = window.localStorage.getItem('user_info')
-  if (to.path !== '/login') {
-  // 非登录页面
-    if (!userInfo) {
-      // 解决登录页进度条卡顿问题,判断如果路径来自登录页,就停止进度条
-      if (from.path === '/login') {
-        nprogress.done()
-      }
-      // 没有登录,跳转到登录页面
-      next({ name: 'login' })
-    } else {
-      // 登录了,允许访问
-      next()
-    }
-  } else {
-  // 登录页面
-    if (!userInfo) {
-    // 没有登录,允许访问
-      next()
-    } else {
-    // 登录了,不允许访问
-      window.location.href = '/#/'
-      window.location.reload()
-    }
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   // 开启进度条
+//   nprogress.start()
+//   // 获取本地存储中的用户信息,如果有,说明已经登录了
+//   const userInfo = window.localStorage.getItem('user_info')
+//   if (to.path !== '/login') {
+//   // 非登录页面
+//     if (!userInfo) {
+//       // 解决登录页进度条卡顿问题,判断如果路径来自登录页,就停止进度条
+//       if (from.path === '/login') {
+//         nprogress.done()
+//       }
+//       // 没有登录,跳转到登录页面
+//       next({ name: 'login' })
+//     } else {
+//       // 登录了,允许访问
+//       next()
+//     }
+//   } else {
+//   // 登录页面
+//     if (!userInfo) {
+//     // 没有登录,允许访问
+//       next()
+//     } else {
+//     // 登录了,不允许访问
+//       window.location.href = '/#/'
+//       window.location.reload()
+//     }
+//   }
+// })
 // 配置全局后置钩子,结束进度条
 router.afterEach((to, from) => {
   nprogress.done()

@@ -42,8 +42,8 @@ export default {
   data () {
     return {
       UserForm: {
-        mobile: '',
-        code: '',
+        mobile: '15236485854',
+        code: '246810',
         type: true
       },
       // 表单验证
@@ -149,14 +149,14 @@ export default {
     // 封装登录功能
     async submitLogin () {
       try {
-        if (this.UserForm.type !== true) {
-          this.$message({
-            showClose: true,
-            message: '请勾选协议',
-            type: 'warning'
-          })
-          return
-        }
+        // if (this.UserForm.type !== true) {
+        //   this.$message({
+        //     showClose: true,
+        //     message: '请勾选协议',
+        //     type: 'warning'
+        //   })
+        //   return
+        // }
         const userInfo = await this.$http({
           method: 'POST',
           url: '/authorizations',

@@ -15,8 +15,8 @@ Vue.config.productionTip = false
 // 将axios配置到vue原型中,这样在组件中可以直接使用,不用加载
 Vue.prototype.$http = axios
 // 配置axios接口路径
-// axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
-axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
+axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
+// axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
 
 // 配置请求拦截器,统一处理token,方便后续使用
 axios.interceptors.request.use(config => {
