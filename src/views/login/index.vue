@@ -14,7 +14,7 @@
           <el-input v-model="UserForm.code" placeholder="验证码"></el-input>
           </el-col>
           <el-col :offset="1" :span="6">
-            <el-button id="SendBtn" @click="handleSendCode">获取验证码</el-button>
+            <el-button id="SendBtn" @click="handleSendCode" :loading="codeLoading">获取验证码</el-button>
           </el-col>
         </el-form-item>
          <el-form-item class="form-argee" prop="type">
@@ -23,7 +23,7 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item>
-          <el-button class="form-btn" type="primary" @click="handleLogin">登录</el-button>
+          <el-button class="form-btn" type="primary" @click="handleLogin" :loading="loginLoading">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -42,10 +42,12 @@ export default {
   data () {
     return {
       UserForm: {
-        mobile: '15236485854',
+        mobile: '13911111111',
         code: '246810',
         type: true
       },
+      loginLoading: false, // 登录按钮加载中
+      codeLoading: false, // 验证码按钮加载中
       // 表单验证
       rules: {
         mobile: [
@@ -63,45 +65,51 @@ export default {
   methods: {
     // 封装发送验证码的函数
     async showGeeTest () {
-      const { mobile } = this.UserForm
-      const data = await this.$http({
-        method: 'GET',
-        url: `/captchas/${mobile}`
-      })
-      // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
-      const captchaObj = await initGeetest({
-        // 以下配置参数来自服务端 SDK
-        gt: data.gt,
-        challenge: data.challenge,
-        offline: !data.success,
-        new_captcha: data.new_captcha,
-        product: 'bind' // 隐藏式弹出框验证
-      })
-      // 这里可以调用验证实例 captchaObj 的实例方法
-      captchaObj.onReady(() => {
-        // 验证码ready之后才能调用verify方法显示验证码
-        captchaObj.verify() // 显示弹框验证码
-      }).onSuccess(async () => {
-        // console.log(captchaObj.getValidate())
-        // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
-        const {
-          geetest_challenge: challenge,
-          geetest_seccode: seccode,
-          geetest_validate: validate } = captchaObj.getValidate()
-        // 向短信接口发送请求
-        await this.$http({
+      try {
+        const { mobile } = this.UserForm
+        const data = await this.$http({
           method: 'GET',
-          url: `/sms/codes/${mobile}`,
-          params: {
-            challenge,
-            seccode,
-            validate
-          }
+          url: `/captchas/${mobile}`
         })
-        // console.log(res.data) // 返回发送短信时的手机号
-        // 调用倒计时函数
-        this.codeCountDown()
-      })
+        // 请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
+        const captchaObj = await initGeetest({
+          // 以下配置参数来自服务端 SDK
+          gt: data.gt,
+          challenge: data.challenge,
+          offline: !data.success,
+          new_captcha: data.new_captcha,
+          product: 'bind' // 隐藏式弹出框验证
+        })
+        // 这里可以调用验证实例 captchaObj 的实例方法
+        captchaObj.onReady(() => {
+          // 验证码ready之后才能调用verify方法显示验证码
+          captchaObj.verify() // 显示弹框验证码
+        }).onSuccess(async () => {
+          // console.log(captchaObj.getValidate())
+          // 验证成功,输出的结果提取转变为短信接口要接收的参数形式
+          const {
+            geetest_challenge: challenge,
+            geetest_seccode: seccode,
+            geetest_validate: validate } = captchaObj.getValidate()
+          // 向短信接口发送请求
+          await this.$http({
+            method: 'GET',
+            url: `/sms/codes/${mobile}`,
+            params: {
+              challenge,
+              seccode,
+              validate
+            }
+          })
+          // console.log(res.data) // 返回发送短信时的手机号
+          // 调用倒计时函数
+          this.codeCountDown()
+          // 倒计时开始,让验证码按钮开始显示加载中
+          this.codeLoading = true
+        })
+      } catch (err) {
+        this.$message.error('发送验证码失败')
+      }
     },
     // 发送验证码时验证手机号
     handleSendCode () {
@@ -132,6 +140,8 @@ export default {
             oBtn.innerText = '点击重新获取'
             oBtn.classList.remove('disable')
             flag = true
+            // 倒计时结束,让验证码按钮停止显示加载中,放开按钮
+            this.codeLoading = false
           }
         }, 1000)
       }
@@ -157,6 +167,8 @@ export default {
         //   })
         //   return
         // }
+        // 点击登录,开始加载
+        this.loginLoading = true
         const userInfo = await this.$http({
           method: 'POST',
           url: '/authorizations',
@@ -175,6 +187,8 @@ export default {
         // 登录成功,使用localStorage保存用户信息
         // window.localStorage.setItem('user_info', JSON.stringify(userInfo))
         setUser(userInfo)
+        // 登录成功,停止加载
+        this.loginLoading = false
       } catch {
         // 登录失败,提示消息
         this.$message.error('登录失败,请检查手机号或验证码')

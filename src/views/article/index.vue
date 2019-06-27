@@ -10,37 +10,38 @@
     <!-- /筛选部分 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>一共找到xxx条数据</span>
+        <span>共找到<strong>{{ totalCount }}</strong>条数据</span>
       </div>
-    <!-- 列表部分 -->
-    <!--  slot-scope  固定属性名   scope.row  就是当前遍历对象,就像item一样 -->
-      <el-table class="table-card" :data="articles" style="width: 100%">
-        <el-table-column label="封面" width="180">
+      <!-- 列表部分 -->
+      <!--  slot-scope  固定属性名   scope.row  就是当前遍历对象,就像item一样 -->
+      <el-table class="table-card" :data="articles" style="width: 100%" v-loading="loading">
+        <el-table-column label="封面" width="350">
           <template slot-scope="scope">
             <img
              v-for="item in scope.row.cover.images"
              :key="item"
              :src="item"
-             width="30">
+             width="200">
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="标题" width="180"></el-table-column>
-        <el-table-column label="状态" width="180">
+        <el-table-column prop="title" label="标题" width="300"></el-table-column>
+        <el-table-column label="状态" width="300">
           <template slot-scope="scope">
             <el-tag :type="statTypes[scope.row.status].type">
               {{ statTypes[scope.row.status].label }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="pubdate" label="发布时间" width="180"></el-table-column>
-        <el-table-column prop="name" label="操作" width="180">
+        <el-table-column prop="pubdate" label="发布时间" width="300"></el-table-column>
+        <el-table-column prop="name" label="操作" width="350">
           <el-button size="mini" type="primary" plain>修改</el-button>
           <el-button size="mini" type="danger" plain>删除</el-button>
         </el-table-column>
       </el-table>
-    <!-- /列表部分 -->
-    <!-- 分页部分 -->
+      <!-- /列表部分 -->
+      <!-- 分页部分 -->
       <el-pagination
+      :disabled="loading"
       background
       layout="prev, pager, next"
       :page-size="pageSize"
@@ -83,7 +84,8 @@ export default {
       ],
       pageSize: 10, // 每页十条
       totalCount: 0, // 文章总数
-      page: 1 // 默认为1
+      page: 1, // 默认为1
+      loading: false // 加载中
     }
   },
   created () {
@@ -92,6 +94,8 @@ export default {
   },
   methods: {
     async loadArticles () {
+      // 请求开始,开始加载
+      this.loading = true
       // 获取token,设置请求头,请求头中设置 Authorization
       const data = await this.$http({
         method: 'GET',
@@ -104,6 +108,8 @@ export default {
       // console.log(data.results)
       this.articles = data.results
       this.totalCount = data.total_count
+      // 请求结束,停止加载
+      this.loading = false
     },
     handleCurrentChange (page) {
       // console.log(page)
@@ -117,18 +123,6 @@ export default {
 </script>
 
 <style lang='less' scoped>
-  .item {
-    margin-bottom: 18px;
-  }
-
-  .clearfix:before,
-  .clearfix:after {
-    display: table;
-    content: "";
-  }
-  .clearfix:after {
-    clear: both
-  }
   .box-card {
     width: 100%;
     .el-pagination {
