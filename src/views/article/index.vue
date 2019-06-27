@@ -40,7 +40,7 @@
           </el-col>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">筛选</el-button>
+          <el-button type="primary" :loading="loading" @click="handleFiterParams">筛选</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -76,8 +76,9 @@
         </el-table-column>
       </el-table>
       <!-- /列表部分 -->
-      <!-- 分页部分 -->
+      <!-- 分页部分 current-page="page" 表示随着页数的变化,对应页码高亮显示 -->
       <el-pagination
+      :current-page="page"
       :disabled="loading"
       background
       layout="prev, pager, next"
@@ -139,6 +140,13 @@ export default {
     this.loadChannels()
   },
   methods: {
+    // 点击筛选,根据表单数据去查询内容列表
+    handleFiterParams () {
+      // 查询从第一页开始加载数据
+      this.page = 1
+      // 加载内容列表
+      this.loadArticles()
+    },
     // 监听日期选择器,获取相应数据
     handleDateChange (value) {
       // console.log(value)
@@ -160,15 +168,26 @@ export default {
     },
     // 请求加载内容列表
     async loadArticles () {
-      // 请求开始,开始加载
+      // 请求开始,开始加载中
       this.loading = true
+      // 去除提交的表单数据中的无用字段
+      const filterData = {}
+      // 循环filterParams
+      for (let key in this.filterParams) {
+        // 定义变量接收filterParams中的数据
+        const item = this.filterParams[key]
+        if (item !== null && item !== undefined && item !== '') {
+          filterData[key] = item
+        }
+      }
       // 获取token,设置请求头,请求头中设置 Authorization
       const data = await this.$http({
         method: 'GET',
         url: '/articles',
         params: {
           page: this.page, // 页码
-          per_page: this.pageSize // 请求参数,请求每页多少条
+          per_page: this.pageSize, // 请求参数,请求每页多少条
+          ...filterData // es6对象混入语法 表示将filterData 混入当前对象中,并返回当前对象
         }
       })
       // console.log(data.results)
