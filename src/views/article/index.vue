@@ -8,12 +8,12 @@
       <el-form ref="form" :model="filterParams" label-width="80px">
         <el-form-item label="文章状态">
           <el-radio-group v-model="filterParams.status">
-            <el-radio label="全部"></el-radio>
+            <el-radio label="">全部</el-radio>
             <el-radio
               v-for="(item, index) in statTypes"
               :key="index"
-              :label="item.label"
-            ></el-radio>
+              :label="index"
+            >{{ item.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
