@@ -5,7 +5,37 @@
       <div slot="header" class="clearfix">
         <span>全部图文</span>
       </div>
-      <div v-for="o in 4" :key="o" class="text item">{{'列表内容 ' + o }}</div>
+      <el-form ref="form" :model="filterParams" label-width="80px">
+        <el-form-item label="文章状态">
+          <el-radio-group v-model="filterParams.status">
+            <el-radio label="全部"></el-radio>
+            <el-radio
+              v-for="(item, index) in statTypes"
+              :key="index"
+              :label="item.label"
+            ></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="频道">
+          <el-select v-model="filterParams.channel_id">
+            <el-option label="区域一" value="shanghai"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="时间选择">
+          <el-col :span="11">
+            <el-date-picker
+              v-model="filterParams.begin_pubdate"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-col>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary">筛选</el-button>
+        </el-form-item>
+      </el-form>
     </el-card>
     <!-- /筛选部分 -->
     <el-card class="box-card">
@@ -56,7 +86,6 @@
 <script>
 export default {
   name: 'ArticleList',
-
   data () {
     return {
       articles: [],
@@ -85,7 +114,13 @@ export default {
       pageSize: 10, // 每页十条
       totalCount: 0, // 文章总数
       page: 1, // 默认为1
-      loading: false // 加载中
+      loading: false, // 加载中
+      filterParams: {
+        status: '', // 文章状态
+        channel_id: '', // 文章id
+        begin_pubdate: '', // 开始时间
+        end_pubdate: '' // 结束时间
+      }
     }
   },
   created () {
