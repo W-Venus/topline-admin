@@ -17,7 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="filterParams.channel_id">
+          <el-select v-model="filterParams.channel_id" clearable>
             <el-option
               v-for="item in channels"
               :key="item.id"
@@ -29,8 +29,10 @@
         <el-form-item label="时间选择">
           <el-col :span="11">
             <el-date-picker
-              v-model="filterParams.begin_pubdate"
-              type="datetimerange"
+              value-format="yyyy-MM-dd"
+              @change="handleDateChange"
+              v-model="range_date"
+              type="daterange"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
@@ -126,6 +128,7 @@ export default {
         begin_pubdate: '', // 开始时间
         end_pubdate: '' // 结束时间
       },
+      range_date: '', // 时间绑定值,在这里无意义,为了触发日期选择器的change事件
       channels: [] // 频道数据
     }
   },
@@ -136,6 +139,12 @@ export default {
     this.loadChannels()
   },
   methods: {
+    // 监听日期选择器,获取相应数据
+    handleDateChange (value) {
+      // console.log(value)
+      this.filterParams.begin_pubdate = value[0]
+      this.filterParams.end_pubdate = value[1]
+    },
     // 请求频道数据
     async loadChannels () {
       try {
@@ -149,6 +158,7 @@ export default {
         this.$message.error('请求错误')
       }
     },
+    // 请求加载内容列表
     async loadArticles () {
       // 请求开始,开始加载
       this.loading = true
@@ -167,6 +177,7 @@ export default {
       // 请求结束,停止加载
       this.loading = false
     },
+    // 页码改变时请求相应页码的数据
     handleCurrentChange (page) {
       // console.log(page)
       // 将点击的当前页码,传给请求的参数页码,获取当页数据
