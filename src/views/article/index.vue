@@ -17,14 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="filterParams.channel_id" clearable>
-            <el-option
-              v-for="item in channels"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
+          <article-channel v-model="filterParams.channel_id"></article-channel>
         </el-form-item>
         <el-form-item label="时间选择">
           <el-col :span="11">
@@ -94,8 +87,15 @@
 </template>
 
 <script>
+// 加载ArticleChannel组件
+import ArticleChannel from '@/components/article-channel'
+
 export default {
   name: 'ArticleList',
+  // 注册
+  components: {
+    ArticleChannel
+  },
   data () {
     return {
       articles: [],
@@ -131,15 +131,15 @@ export default {
         begin_pubdate: '', // 开始时间
         end_pubdate: '' // 结束时间
       },
-      range_date: '', // 时间绑定值,在这里无意义,为了触发日期选择器的change事件
-      channels: [] // 频道数据
+      range_date: '' // 时间绑定值,在这里无意义,为了触发日期选择器的change事件
+      // channels: [] // 频道数据
     }
   },
   created () {
     // 初始化开始就请求文章内容列表数据
     this.loadArticles()
     // 请求频道数据
-    this.loadChannels()
+    // this.loadChannels()
   },
   methods: {
     async handleDelete (item) {
@@ -183,18 +183,18 @@ export default {
       this.filterParams.end_pubdate = value[1]
     },
     // 请求频道数据
-    async loadChannels () {
-      try {
-        const data = await this.$http({
-          method: 'GET',
-          url: '/channels'
-        })
-        //  console.log(channels)
-        this.channels = data.channels
-      } catch (err) {
-        this.$message.error('请求错误')
-      }
-    },
+    // async loadChannels () {
+    //   try {
+    //     const data = await this.$http({
+    //       method: 'GET',
+    //       url: '/channels'
+    //     })
+    //     //  console.log(channels)
+    //     this.channels = data.channels
+    //   } catch (err) {
+    //     this.$message.error('请求错误')
+    //   }
+    // },
     // 请求加载内容列表
     async loadArticles () {
       // 请求开始,开始加载中
