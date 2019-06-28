@@ -10,6 +10,8 @@ import './styles/index.less'
 // 引入进度条样式
 import 'nprogress/nprogress.css'
 import { getUser, removeUser } from '@/utils/auth'
+// 引入jsonbig
+import JSONbig from 'json-bigint'
 
 Vue.config.productionTip = false
 // 将axios配置到vue原型中,这样在组件中可以直接使用,不用加载
@@ -17,6 +19,20 @@ Vue.prototype.$http = axios
 // 配置axios接口路径
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
 // axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
+
+// axios 预留的自定义处理后端返回的原始数据
+// 可以理解成又是一个响应拦截器,这里的data是后端返回的未经处理的原始数据
+// axios 默认使用JSON.parse 去转换原始数据,如果其中有超出安全整数范围的数据就有问题了
+axios.defaults.transformResponse = [function (data) {
+  // 类似于JSON.parse,但是它会处理其中超出安全整数范围的整数问题
+  try {
+    // 如果是json格式字符串,那就转换并返回给后续使用
+    return JSONbig.parse(data)
+  } catch (err) {
+    // 报错意味着data不是json格式字符串,那就直接原样返回给后续使用
+    return data
+  }
+}]
 
 // 配置请求拦截器,统一处理token,方便后续使用
 axios.interceptors.request.use(config => {

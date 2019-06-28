@@ -45,11 +45,11 @@
       </el-form>
     </el-card>
     <!-- /筛选部分 -->
+      <!-- 列表部分 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span>共找到<strong>{{ totalCount }}</strong>条数据</span>
       </div>
-      <!-- 列表部分 -->
       <!--  slot-scope  固定属性名   scope.row  就是当前遍历对象,就像item一样 -->
       <el-table class="table-card" :data="articles" style="width: 100%" v-loading="loading">
         <el-table-column label="封面" width="350">
@@ -71,8 +71,10 @@
         </el-table-column>
         <el-table-column prop="pubdate" label="发布时间" width="300"></el-table-column>
         <el-table-column prop="name" label="操作" width="350">
-          <el-button size="mini" type="primary" plain>修改</el-button>
-          <el-button size="mini" type="danger" plain>删除</el-button>
+          <template slot-scope="scope">
+            <el-button size="mini" type="primary" plain>修改</el-button>
+            <el-button size="mini" type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <!-- /列表部分 -->
@@ -140,6 +142,33 @@ export default {
     this.loadChannels()
   },
   methods: {
+    async handleDelete (item) {
+      // console.log(item.id.toString()) 返回字符串
+      this.$confirm('确定删除吗', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        this.loadArticles()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+      try {
+        await this.$http({
+          method: 'DELETE',
+          url: `/articles/${item.id}`
+        })
+      } catch (err) {
+        this.$message.error('删除失败')
+      }
+    },
     // 点击筛选,根据表单数据去查询内容列表
     handleFiterParams () {
       // 查询从第一页开始加载数据
