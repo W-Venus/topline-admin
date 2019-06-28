@@ -13,10 +13,10 @@
             <el-input type="textarea" v-model="form.content"></el-input>
           </el-form-item>
           <el-form-item label="封面">
-            <el-radio-group v-model="form.cover">
+            <!-- <el-radio-group v-model="form.cover">
               <el-radio label="线上品牌商赞助"></el-radio>
               <el-radio label="线下场地免费"></el-radio>
-            </el-radio-group>
+            </el-radio-group> -->
           </el-form-item>
           <el-form-item label="频道">
             <!-- 组件传值
@@ -32,8 +32,8 @@
             <article-channel v-model="form.channel_id"></article-channel>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">发表</el-button>
-            <el-button>存入草稿</el-button>
+            <el-button type="primary" @click="handlePublish(false)">发表</el-button>
+            <el-button @click="handlePublish(true)">存入草稿</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -55,9 +55,9 @@ export default {
       form: {
         title: '', // 标题
         content: '', // 内容
-        channel_id: 3, // 频道
+        channel_id: '', // 频道
         cover: { // 封面  -1:自动，0-无图，1-1张，3-3张
-          type: '0',
+          type: 0,
           images: []
         }
       }
@@ -65,7 +65,25 @@ export default {
   },
 
   methods: {
-    onSubmit () {}
+    async handlePublish (draft) {
+      try {
+        await this.$http({
+          method: 'POST',
+          url: '/articles',
+          params: {
+            draft
+          },
+          data: this.form
+        })
+        this.$message({
+          showClose: true,
+          message: '发布成功',
+          type: 'success'
+        })
+      } catch (err) {
+        this.$message.error('发布失败')
+      }
+    }
   }
 }
 </script>
