@@ -99,7 +99,7 @@ export default {
       try {
         // 判断是编辑页面还是发布页面,编辑页面的话就发修改请求
         if (this.$route.name === 'publish-edit') {
-          this.$http({
+          await this.$http({
             method: 'PUT',
             url: `/articles/${this.$route.params.id}`,
             params: {
