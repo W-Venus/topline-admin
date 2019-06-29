@@ -75,23 +75,58 @@ export default {
       editorOption: {}
     }
   },
-
+  created () {
+    // 判断是否是编辑页面,是编辑页面的话就去发请求
+    if (this.$route.name === 'publish-edit') {
+      this.loadArticle()
+    }
+  },
   methods: {
+    // 根据id去查询对应数据,渲染在页面中
+    async loadArticle () {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: `/articles/${this.$route.params.id}` // 获取动态绑定的id
+        })
+        // console.log(data)
+        this.form = data
+      } catch (err) {
+        this.$message.error('修改失败')
+      }
+    },
     async handlePublish (draft) {
       try {
-        await this.$http({
-          method: 'POST',
-          url: '/articles',
-          params: {
-            draft
-          },
-          data: this.form
-        })
-        this.$message({
-          showClose: true,
-          message: '发布成功',
-          type: 'success'
-        })
+        // 判断是编辑页面还是发布页面,编辑页面的话就发修改请求
+        if (this.$route.name === 'publish-edit') {
+          this.$http({
+            method: 'PUT',
+            url: `/articles/${this.$route.params.id}`,
+            params: {
+              draft
+            },
+            data: this.form
+          })
+          this.$message({
+            showClose: true,
+            message: '修改成功',
+            type: 'success'
+          })
+        } else {
+          await this.$http({
+            method: 'POST',
+            url: '/articles',
+            params: {
+              draft
+            },
+            data: this.form
+          })
+          this.$message({
+            showClose: true,
+            message: '发布成功',
+            type: 'success'
+          })
+        }
       } catch (err) {
         this.$message.error('发布失败')
       }

@@ -65,7 +65,7 @@
         <el-table-column prop="pubdate" label="发布时间" width="300"></el-table-column>
         <el-table-column prop="name" label="操作" width="350">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" plain>修改</el-button>
+            <el-button size="mini" type="primary" plain @click="$router.push(`/publish/${scope.row.id}`)">修改</el-button>
             <el-button size="mini" type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -73,13 +73,13 @@
       <!-- /列表部分 -->
       <!-- 分页部分 current-page="page" 表示随着页数的变化,对应页码高亮显示 -->
       <el-pagination
-      :current-page="page"
-      :disabled="loading"
-      background
-      layout="prev, pager, next"
-      :page-size="pageSize"
-      :total="totalCount"
-      @current-change="handleCurrentChange"
+        :current-page="page"
+        :disabled="loading"
+        background
+        layout="prev, pager, next"
+        :page-size="pageSize"
+        :total="totalCount"
+        @current-change="handleCurrentChange"
       ></el-pagination>
     <!-- /分页部分 -->
     </el-card>
