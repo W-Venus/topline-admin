@@ -42,7 +42,7 @@
           <el-menu-item index="1-4">粉丝列表</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-menu-item index="4">
+      <el-menu-item index="/account">
         <i class="el-icon-setting"></i>
         <span slot="title">账户信息</span>
       </el-menu-item>
