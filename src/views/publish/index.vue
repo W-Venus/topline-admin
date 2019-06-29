@@ -4,13 +4,17 @@
       <span>发布文章</span>
     </div>
     <el-row>
-      <el-col :span="10">
+      <el-col>
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="标题">
             <el-input v-model="form.title"></el-input>
           </el-form-item>
           <el-form-item label="内容">
-            <el-input type="textarea" v-model="form.content"></el-input>
+            <quill-editor
+              ref="myTextEditor"
+              v-model="form.content"
+              :options="editorOption">
+            </quill-editor>
           </el-form-item>
           <el-form-item label="封面">
             <!-- <el-radio-group v-model="form.cover">
@@ -42,13 +46,20 @@
 </template>
 
 <script>
+// 加载富文本编辑器样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+// 加载富文本编辑器
+import { quillEditor } from 'vue-quill-editor'
 // 加载组件
 import ArticleChannel from '@/components/article-channel'
 export default {
   name: 'Publish',
   // 注册
   components: {
-    ArticleChannel
+    ArticleChannel,
+    quillEditor
   },
   data () {
     return {
@@ -60,7 +71,8 @@ export default {
           type: 0,
           images: []
         }
-      }
+      },
+      editorOption: {}
     }
   },
 
@@ -87,6 +99,12 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+  .ql-container {
+      height: 400px;
+    }
+</style>
 
 <style lang='less' scoped>
   .publish-card {
