@@ -23,10 +23,12 @@
     </el-table>
     <!-- 分页 -->
     <el-pagination
+      @current-change="handleCurrentChange"
+      :page-size="pageSize"
       class="comment-page"
       background
       layout="prev, pager, next"
-      :total="1000">
+      :total="totalCount">
     </el-pagination>
   </el-card>
 </template>
@@ -37,13 +39,24 @@ export default {
 
   data () {
     return {
-      comments: []
+      comments: [],
+      page: 1, // 默认是第一页
+      pageSize: 10, // 每页10条
+      totalCount: 0 // 总记录,默认是0
     }
   },
   created () {
     this.loadComments()
   },
   methods: {
+    // 页码改变时请求当前页的内容
+    handleCurrentChange (page) {
+      // console.log(page)
+      // 将当前点击的页码传递给数据中的page,然后下面发请求请求对应的列表数据
+      this.page = page
+      // 重新加载列表
+      this.loadComments()
+    },
     // 请求评论列表
     async loadComments () {
       try {
@@ -51,6 +64,8 @@ export default {
           method: 'GET',
           url: '/articles',
           params: {
+            page: this.page,
+            per_page: this.pageSize,
             response_type: 'comment'
           }
         })
@@ -58,7 +73,9 @@ export default {
         data.results.forEach(item => {
           item.disabled = false
         })
-        // console.log(data.results)
+        // console.log(data)
+        // 总条数
+        this.totalCount = data.total_count
         this.comments = data.results
       } catch (err) {
         this.$message.error('请求评论列表失败')
