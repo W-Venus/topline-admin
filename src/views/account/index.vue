@@ -28,6 +28,11 @@
       </el-col>
       <el-col :span="10" :offset="3">
         <p>用户头像</p>
+        <!--
+          action  必选参数,上传的地址
+          http-request  覆盖默认的上传行为,自定义上传方式
+          show-file-list是否显示已上传文件列表
+           -->
         <el-upload
           :http-request="handleUp"
           class="avatar-uploader"
