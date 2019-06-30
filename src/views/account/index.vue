@@ -77,6 +77,8 @@ export default {
         })
         // console.log(data)
         this.user.photo = data.photo
+        // 调用mutation函数
+        this.$store.commit('changeUser', this.user)
         this.$message({
           type: 'success',
           message: '上传成功'
@@ -88,12 +90,15 @@ export default {
     // 编辑用户资料
     async editUser () {
       try {
-        await this.$http({
+        const data = await this.$http({
           method: 'PATCH',
           url: '/user/profile',
           data: this.user
         })
         // console.log(data)
+        // 调用mutation函数,将修改后的用户信息传到mutation函数中,
+        // mutation函数中接收数据然后进行修改
+        this.$store.commit('changeUser', data)
         this.$message({
           type: 'success',
           message: '保存成功'

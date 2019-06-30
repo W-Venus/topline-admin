@@ -12,6 +12,8 @@ import 'nprogress/nprogress.css'
 import { getUser, removeUser } from '@/utils/auth'
 // 引入jsonbig
 import JSONbig from 'json-bigint'
+// 引入store
+import store from './store'
 
 Vue.config.productionTip = false
 // 将axios配置到vue原型中,这样在组件中可以直接使用,不用加载
@@ -69,5 +71,6 @@ Vue.use(ElementUI)
 
 new Vue({
   router,
+  store, // 配置store
   render: h => h(App)
 }).$mount('#app')
