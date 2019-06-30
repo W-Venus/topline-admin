@@ -3,9 +3,9 @@
     <el-row class="header">
       <el-col :span="17"><div class="grid-content"><i class="iconfont icon-ma1"></i>江苏传智播客教育科技股份有限公司</div></el-col>
       <el-col :span="3" :offset="4">
-        <img class="photo" :src="userInfo.photo">
+        <img class="photo" :src="$store.state.user.photo">
         <el-dropdown trigger="click">
-          <span class="el-dropdown-link">{{userInfo.name}}
+          <span class="el-dropdown-link">{{$store.state.user.name}}
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
         <el-dropdown-menu slot="dropdown">
@@ -21,18 +21,18 @@
 
 <script>
 // 加载auth.js
-import { getUser, removeUser } from '@/utils/auth'
+import { removeUser } from '@/utils/auth'
 export default {
   name: 'AppHeader',
   data () {
     return {
-      userInfo: {}
+      // userInfo: {}
     }
   },
   created () {
     // this.userInfo = JSON.parse(window.localStorage.getItem('user_info'))
     // 使用模块化的本地存储
-    this.userInfo = getUser()
+    // this.userInfo = getUser()
   },
   methods: {
     handleLogout () {
