@@ -42,7 +42,7 @@ export default {
   data () {
     return {
       UserForm: {
-        mobile: '13911111111',
+        mobile: '15236485854',
         code: '246810',
         type: true
       },

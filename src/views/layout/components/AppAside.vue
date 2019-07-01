@@ -36,7 +36,7 @@
           <span>粉丝管理</span>
         </template>
         <el-menu-item-group>
-          <el-menu-item index="1-1">图文数据</el-menu-item>
+          <el-menu-item index="/fans">图文数据</el-menu-item>
           <el-menu-item index="1-2">粉丝概况</el-menu-item>
           <el-menu-item index="1-3">粉丝画像</el-menu-item>
           <el-menu-item index="1-4">粉丝列表</el-menu-item>

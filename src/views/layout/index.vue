@@ -14,7 +14,8 @@
         </el-header>
         <!-- 内容 -->
         <el-main>
-            <router-view/>
+            <!-- 禁用路由缓存 -->
+            <router-view :key="$route.path"/>
         </el-main>
       </el-container>
   </el-container>
